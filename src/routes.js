@@ -13,16 +13,24 @@ const profile = {
   "vacation-per-year": 4,
 };
 
+const jobs = [];
+
 routes.get("/", (req, res) => res.render(views + "index"));
+
 routes.get("/job", (req, res) => res.render(views + "job"));
+routes.post("/job", (req, res) => {
+  const job = req.body;
+  job.createdAt = Date.now();
+
+  jobs.push(job);
+  //console.log(jobs);
+  return res.redirect("/");
+});
+
 routes.get("/job/edit", (req, res) => res.render(views + "job-edit"));
 routes.get("/profile", (req, res) =>
   res.render(views + "profile", { profile })
 );
-
-routes.get("/index", (req, res) => {
-  return res.redirect("/");
-});
 
 routes.get("/index", (req, res) => {
   return res.redirect("/");

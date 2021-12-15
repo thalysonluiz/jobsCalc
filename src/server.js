@@ -4,7 +4,10 @@ const routes = require("./routes");
 
 app.set("view engine", "ejs");
 
+//usar arquivos estáticos
 app.use(express.static("public"));
+//habilitar req.body
+app.use(express.urlencoded({ extended: true }));
 
 app.use(routes);
 
