@@ -12,11 +12,31 @@ const Profile = {
     "hours-per-day": 5,
     "days-per-week": 5,
     "vacation-per-year": 4,
-    "value-per-hour": 75,
+    "value-hour": 75,
   },
   controllers: {
     index(req, res) {
       return res.render(views + "profile", { profile: Profile.data });
+    },
+
+    update(req, res) {
+      const data = req.body;
+
+      const weeksPerYear = 52;
+
+      const weeksPerMonth = (weeksPerYear - data["vacation-per-year"]) / 12;
+      const weekTotalHours = data["hours-per-day"] * data["days-per-week"];
+      const monthlyTotalHours = weeksPerMonth * weekTotalHours;
+
+      const valueHour = data["monthly-budget"] / monthlyTotalHours;
+
+      Profile.data = {
+        ...Profile.data,
+        ...data,
+        "value-hour": valueHour,
+      };
+      console.log(Profile.data);
+      return res.redirect("/profile");
     },
   },
 };
@@ -93,6 +113,7 @@ routes.post("/job", Job.controllers.create);
 
 routes.get("/job/edit", (req, res) => res.render(views + "job-edit"));
 routes.get("/profile", Profile.controllers.index);
+routes.post("/profile", Profile.controllers.update);
 
 routes.get("/index", (req, res) => {
   return res.redirect("/");
