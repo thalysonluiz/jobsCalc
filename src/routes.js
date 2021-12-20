@@ -128,6 +128,13 @@ const Job = {
 
       res.redirect("/job/" + id);
     },
+    delete(req, res) {
+      const { id } = req.params;
+
+      Job.data = Job.data.filter((job) => Number(job.id) !== Number(id));
+
+      res.redirect("/");
+    },
   },
   services: {
     remainingDays(job) {
@@ -154,6 +161,7 @@ routes.post("/job", Job.controllers.create);
 
 routes.get("/job/:id", Job.controllers.show);
 routes.post("/job/:id", Job.controllers.update);
+routes.post("/job/delete/:id", Job.controllers.delete);
 
 routes.get("/profile", Profile.controllers.index);
 routes.post("/profile", Profile.controllers.update);
