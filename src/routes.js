@@ -1,46 +1,7 @@
 const express = require("express");
 const routes = express.Router();
-
-const views = __dirname + "/views/";
-
-const Profile = {
-  data: {
-    name: "Jakeliny",
-    avatar:
-      "https://avatars.githubusercontent.com/u/17316392?s=460&u=6912a91a70bc89745a2079fdcdad3bc3ce370f13&v=4",
-    "monthly-budget": 3000,
-    "hours-per-day": 5,
-    "days-per-week": 5,
-    "vacation-per-year": 4,
-    "value-hour": 75,
-  },
-  controllers: {
-    index(req, res) {
-      return res.render(views + "profile", { profile: Profile.data });
-    },
-
-    update(req, res) {
-      const data = req.body;
-
-      const weeksPerYear = 52;
-
-      const weeksPerMonth = (weeksPerYear - data["vacation-per-year"]) / 12;
-      const weekTotalHours = data["hours-per-day"] * data["days-per-week"];
-      const monthlyTotalHours = weeksPerMonth * weekTotalHours;
-
-      const valueHour = data["monthly-budget"] / monthlyTotalHours;
-
-      Profile.data = {
-        ...Profile.data,
-        ...data,
-        "value-hour": valueHour,
-      };
-      //console.log(Profile.data);
-
-      return res.redirect("/profile");
-    },
-  },
-};
+const ProfileController = require("./controllers/ProfileController");
+const Profile = require("./model/Profile");
 
 const Job = {
   data: [
@@ -71,11 +32,14 @@ const Job = {
           ...job,
           remaining,
           status,
-          budget: Job.services.calculateBudget(job, Profile.data["value-hour"]),
+          budget: Job.services.calculateBudget(
+            job,
+            Profile.get()["value-hour"]
+          ),
         };
       });
 
-      return res.render(views + "index", { jobs: updatedJobs });
+      return res.render("index", { jobs: updatedJobs });
     },
 
     create(req, res) {
@@ -97,10 +61,10 @@ const Job = {
 
       job.budget = Job.services.calculateBudget(
         job,
-        Profile.data["value-hour"]
+        Profile.get()["value-hour"]
       );
       //console.log(job);
-      return res.render(views + "job-edit", { job });
+      return res.render("job-edit", { job });
     },
 
     update(req, res) {
@@ -110,7 +74,7 @@ const Job = {
       const job = Job.data.find((job) => Number(job.id) === Number(id));
       if (!job) return res.status(404).send({ message: "Job not found" });
 
-      budget = Job.services.calculateBudget(job, Profile.data["value-hour"]);
+      budget = Job.services.calculateBudget(job, Profile.get()["value-hour"]);
 
       const updatedJob = {
         ...job,
@@ -156,15 +120,15 @@ const Job = {
 
 routes.get("/", Job.controllers.index);
 
-routes.get("/job", (req, res) => res.render(views + "job"));
+routes.get("/job", (req, res) => res.render("job"));
 routes.post("/job", Job.controllers.create);
 
 routes.get("/job/:id", Job.controllers.show);
 routes.post("/job/:id", Job.controllers.update);
 routes.post("/job/delete/:id", Job.controllers.delete);
 
-routes.get("/profile", Profile.controllers.index);
-routes.post("/profile", Profile.controllers.update);
+routes.get("/profile", ProfileController.index);
+routes.post("/profile", ProfileController.update);
 
 routes.get("/index", (req, res) => {
   return res.redirect("/");
