@@ -9,7 +9,7 @@ let data = [
   },
   {
     id: 2,
-    name: "OneTwo Project2",
+    name: "OneTwo Project",
     "daily-hours": 3,
     "total-hours": 2,
     created_at: Date.now(),
@@ -26,5 +26,8 @@ module.exports = {
   },
   delete(id) {
     data = data.filter((job) => Number(job.id) !== Number(id));
+  },
+  create(newJob) {
+    data.push(newJob);
   },
 };

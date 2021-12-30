@@ -11,7 +11,7 @@ module.exports = {
     job.id = lastId + 1;
     job.created_at = Date.now();
 
-    Job.get().push(job);
+    Job.create(job);
     //console.log(jobs);
     return res.redirect("/");
   },
