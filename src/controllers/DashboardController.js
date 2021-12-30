@@ -5,7 +5,7 @@ const jobUtils = require("../utils/jobUtils");
 module.exports = {
   async index(req, res) {
     const profile = await Profile.get();
-    const jobs = Job.get();
+    const jobs = await Job.get();
 
     let statusCount = {
       progress: 0,
@@ -23,6 +23,13 @@ module.exports = {
       }
 
       statusCount[status] += 1;
+
+      console.log({
+        ...job,
+        remaining,
+        status,
+        budget: jobUtils.calculateBudget(job, profile["value-hour"]),
+      });
 
       return {
         ...job,

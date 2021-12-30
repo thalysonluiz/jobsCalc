@@ -5,9 +5,11 @@ const jobUtils = require("../utils/JobUtils");
 module.exports = {
   create: (req, res) => res.render("job"),
 
-  store(req, res) {
+  async store(req, res) {
     const job = req.body;
-    const lastId = Job.get()[Job.get().length - 1]?.id || 0;
+    const jobs = await Job.get();
+
+    const lastId = jobs[jobs.length - 1]?.id || 0;
     job.id = lastId + 1;
     job.created_at = Date.now();
 
@@ -16,25 +18,29 @@ module.exports = {
     return res.redirect("/");
   },
 
-  show(req, res) {
+  async show(req, res) {
     const { id } = req.params;
+    const jobs = await Job.get();
+    const profile = await Profile.get();
 
-    const job = Job.get().find((job) => Number(job.id) === Number(id));
+    const job = jobs.find((job) => Number(job.id) === Number(id));
     if (!job) return res.status(404).send({ message: "Job not found" });
 
-    job.budget = jobUtils.calculateBudget(job, Profile.get()["value-hour"]);
+    job.budget = jobUtils.calculateBudget(job, profile["value-hour"]);
     //console.log(job);
     return res.render("job-edit", { job });
   },
 
-  update(req, res) {
+  async update(req, res) {
     const { id } = req.params;
     const UpJob = req.body;
+    const jobs = await Job.get();
+    const profile = await Profile.get();
 
-    const job = Job.get().find((job) => Number(job.id) === Number(id));
+    const job = jobs.find((job) => Number(job.id) === Number(id));
     if (!job) return res.status(404).send({ message: "Job not found" });
 
-    budget = jobUtils.calculateBudget(job, Profile.get()["value-hour"]);
+    budget = jobUtils.calculateBudget(job, profile["value-hour"]);
 
     const updatedJob = {
       ...job,
@@ -42,7 +48,7 @@ module.exports = {
       budget,
     };
 
-    const newJobs = Job.get().map((job) => {
+    const newJobs = jobs.map((job) => {
       if (Number(job.id) === Number(id)) {
         job = updatedJob;
       }
