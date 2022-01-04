@@ -24,12 +24,12 @@ module.exports = {
 
       statusCount[status] += 1;
 
-      console.log({
-        ...job,
-        remaining,
-        status,
-        budget: jobUtils.calculateBudget(job, profile["value-hour"]),
-      });
+      // console.log({
+      //   ...job,
+      //   remaining,
+      //   status,
+      //   budget: jobUtils.calculateBudget(job, profile["value-hour"]),
+      // });
 
       return {
         ...job,
@@ -40,6 +40,13 @@ module.exports = {
     });
 
     const freeHours = profile["hours-per-day"] - jobTotalHours;
+
+    // console.log({
+    //   jobs,
+    //   profile,
+    //   statusCount,
+    //   freeHours,
+    // });
 
     return res.render("index", {
       jobs: updatedJobs,

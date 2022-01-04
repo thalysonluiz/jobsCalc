@@ -37,13 +37,42 @@ module.exports = {
       };
     });
   },
-  update(newData) {
-    data = newData;
+  async update(newData, id) {
+    const db = await Database();
+
+    const data = await db.run(`UPDATE jobs SET
+      name = "${newData.name}",
+      daily_hours = ${newData["daily-hours"]},
+      total_hours = ${newData["total-hours"]}
+      WHERE id=${id}
+    ;`);
+
+    await db.close();
   },
-  delete(id) {
-    data = data.filter((job) => Number(job.id) !== Number(id));
+  async delete(id) {
+    const db = await Database();
+
+    const data = await db.run(`DELETE FROM jobs
+        WHERE id=${id}
+    ;`);
+
+    await db.close();
   },
-  create(newJob) {
-    data.push(newJob);
+  async create(newJob) {
+    const db = await Database();
+
+    const data = await db.run(`INSERT INTO jobs (
+      name,
+      daily_hours,
+      total_hours,
+      created_at
+      ) VALUES (
+        "${newJob.name}",
+        ${newJob["daily-hours"]},
+        ${newJob["total-hours"]},
+        ${newJob.created_at}
+    );`);
+
+    await db.close();
   },
 };
